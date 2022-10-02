@@ -1,11 +1,34 @@
 use std::fs::read_dir;
+use std::io;
 use std::time::SystemTime;
+use std::path::Path;
 
-pub fn last_update_time(path: &str) -> Option<SystemTime> {
-    // smallest thing I would ever need
-    let mut smallest_time = SystemTime::UNIX_EPOCH;
+#[cfg(test)]
+mod tests {
+    use crate::last_update_time;
 
-    for entry in read_dir(path).ok()? {
+    #[test]
+    fn file() {
+        let result = last_update_time("./src/lib.rs");
+        assert!(result.is_ok());
+    }
+}
+
+pub fn last_update_time(path: &str) -> io::Result<SystemTime> {
+    // first, check if this is a normal file etc.
+    let mut smallest_time = {
+        let path = Path::new(path);
+        let m = path.metadata()?;
+        let time = m
+            .modified()?;
+
+        if !m.is_dir() {
+            return Ok(time);
+        }
+        time
+    };
+
+    for entry in read_dir(path)? {
         if entry.is_err() {
             continue;
         }
@@ -18,13 +41,12 @@ pub fn last_update_time(path: &str) -> Option<SystemTime> {
         let m = m.unwrap();
 
         let mut time = m
-            .modified()
-            .unwrap_or_else(|_| m.created().expect("read modified time or created time"));
+            .modified()?;
 
         if m.is_dir() {
             let path = entry.path();
             let path = path.to_str().unwrap();
-            if let Some(subtime) = last_update_time(path) {
+            if let Ok(subtime) = last_update_time(path) {
                 if subtime < time {
                     time = subtime;
                 }
@@ -36,9 +58,5 @@ pub fn last_update_time(path: &str) -> Option<SystemTime> {
         }
     }
 
-    if smallest_time == SystemTime::UNIX_EPOCH {
-        return None;
-    }
-
-    Some(smallest_time)
+    Ok(smallest_time)
 }
