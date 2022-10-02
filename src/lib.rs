@@ -12,6 +12,11 @@ mod tests {
         let result = last_update_time("./src/lib.rs");
         assert!(result.is_ok());
     }
+    #[test]
+    fn dir() {
+        let result = last_update_time(".");
+        assert!(result.is_ok());
+    }
 }
 
 pub fn last_update_time(path: &str) -> io::Result<SystemTime> {
