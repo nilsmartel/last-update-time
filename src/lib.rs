@@ -6,9 +6,16 @@ pub fn last_update_time(path: &str) -> Option<SystemTime> {
     let mut smallest_time = SystemTime::UNIX_EPOCH;
 
     for entry in read_dir(path).ok()? {
-        let entry = entry.ok()?;
+        if entry.is_err() {
+            continue;
+        }
+        let entry = entry.unwrap();
 
-        let m = entry.metadata().ok()?;
+        let m = entry.metadata();
+        if m.is_err() {
+            continue;
+        }
+        let m = m.unwrap();
 
         let mut time = m
             .modified()
