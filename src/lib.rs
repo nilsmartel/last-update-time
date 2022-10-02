@@ -5,13 +5,7 @@ pub fn last_update_time(path: &str) -> Option<SystemTime> {
     // smallest thing I would ever need
     let mut smallest_time = SystemTime::UNIX_EPOCH;
 
-    let dir = if let Ok(d) = read_dir(path) {
-        d
-    } else {
-        return None;
-    };
-
-    for entry in dir {
+    for entry in read_dir(path).ok()? {
         if entry.is_err() {
             continue;
         }
