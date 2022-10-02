@@ -5,6 +5,7 @@ edition = "2021"
 authors = ["Nils Steffen Martel nilsmartel@yahoo.de"]
 description = "get the last time a file or directory (including its contents) was updated"
 license = "MIT"
+keywords = ["watch", "filesystem", "modified", "event"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
