@@ -1,7 +1,7 @@
 use std::fs::read_dir;
 use std::io;
-use std::time::SystemTime;
 use std::path::Path;
+use std::time::SystemTime;
 
 #[cfg(test)]
 mod tests {
@@ -21,11 +21,10 @@ mod tests {
 
 pub fn last_update_time(path: &str) -> io::Result<SystemTime> {
     // first, check if this is a normal file etc.
-    let mut smallest_time = {
+    let mut largest_time = {
         let path = Path::new(path);
         let m = path.metadata()?;
-        let time = m
-            .modified()?;
+        let time = m.modified()?;
 
         if !m.is_dir() {
             return Ok(time);
@@ -45,23 +44,22 @@ pub fn last_update_time(path: &str) -> io::Result<SystemTime> {
         }
         let m = m.unwrap();
 
-        let mut time = m
-            .modified()?;
+        let mut time = m.modified()?;
 
         if m.is_dir() {
             let path = entry.path();
             let path = path.to_str().unwrap();
             if let Ok(subtime) = last_update_time(path) {
-                if subtime < time {
+                if subtime > time {
                     time = subtime;
                 }
             }
         }
 
-        if time < smallest_time {
-            smallest_time = time;
+        if time > largest_time {
+            largest_time = time;
         }
     }
 
-    Ok(smallest_time)
+    Ok(largest_time)
 }

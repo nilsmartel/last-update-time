@@ -1,6 +1,6 @@
 [package]
 name = "last-update-time"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Nils Steffen Martel nilsmartel@yahoo.de"]
 description = "get the last time a file or directory (including its contents) was updated"
